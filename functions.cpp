@@ -1,6 +1,7 @@
 #include "functions.h"
 #include "globals.h"
 #include "constants.h"
+#inckude "defense.h"
 
 
 bool init()
