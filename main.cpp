@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
     }
     
     //strting game state
-    stateId = STATE_MAIN_GAME;
-    currentState = new MainGame();
+    stateId = STATE_MAIN_MENU;
+    currentState = new MainMenu();
     
     while(stateId != STATE_EXIT)
     {

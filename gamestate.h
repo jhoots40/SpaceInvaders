@@ -2,6 +2,8 @@
 #define GAMESTATE_H
 
 #include "text.h"
+#include "defense.h"
+#include <vector>
 
 class GameState
 {
@@ -12,6 +14,19 @@ public:
     virtual ~GameState() {};
 };
 
+class MainMenu : public GameState
+{
+public:
+    MainMenu();
+    ~MainMenu();
+    void handleEvents();
+    void logic();
+    void render();
+private:
+    Text *spaceInvaders_;
+    Text *play_;
+    Text *instructions_;
+};
 
 class MainGame : public GameState
 {
@@ -22,9 +37,8 @@ public:
     void logic();
     void render();
 private:
-    Text *score_;
-    Text *value_;
     int points_;
+    std::vector<Defense *> d1;
 };
 
 class GameOver : public GameState

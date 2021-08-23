@@ -9,6 +9,8 @@
 #include "bullets.h"
 #include "gamestate.h"
 #include "text.h"
+#include "defense.h"
+#include <vector>
 
 extern SDL_Renderer *renderer;
 extern SDL_Window *window;
@@ -51,4 +53,9 @@ extern GameState *currentState;
 
 extern TTF_Font *font;
 
+extern Text *score;
+
+extern Text *value;
+
+extern std::vector<Defense *> def;
 #endif

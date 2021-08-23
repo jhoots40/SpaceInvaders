@@ -28,3 +28,9 @@ int frame = 0;
 GameState *currentState = NULL;
 
 TTF_Font *font = NULL;
+
+Text *score;
+
+Text *value;
+
+std::vector<Defense *> def;

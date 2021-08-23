@@ -4,6 +4,61 @@
 #include "constants.h"
 #include "text.h"
 
+MainMenu::MainMenu()
+{
+    SDL_Color white = {255, 255, 255};
+    spaceInvaders_ = new Text("Space Invaders", white, 35);
+    play_ = new Text("Click here to play!", white, 28);
+}
+
+MainMenu::~MainMenu()
+{
+    if(spaceInvaders_ != NULL)
+    {
+        delete spaceInvaders_;
+        spaceInvaders_ = NULL;
+    }
+    if(play_ != NULL)
+    {
+        delete play_;
+        play_ = NULL;
+    }
+}
+
+void MainMenu::handleEvents()
+{
+    while(SDL_PollEvent(&event) != 0)
+    {
+        if(event.type == SDL_QUIT)
+        {
+            set_next_state(STATE_EXIT);
+            return;
+        }
+        if(play_->handleEvent())
+        {
+            set_next_state(STATE_MAIN_GAME);
+            return;
+        }
+    }
+}
+
+void MainMenu::logic()
+{
+    
+}
+
+void MainMenu::render()
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xFF);
+    SDL_RenderClear(renderer);
+    
+    spaceInvaders_->render((SCREEN_WIDTH - spaceInvaders_->getWidth()) / 2, SCREEN_HEIGHT / 3);
+    
+    play_->render((SCREEN_WIDTH - play_->getWidth()) / 2, (SCREEN_HEIGHT - play_->getHeight()) / 2);
+
+    SDL_RenderPresent(renderer);
+}
+
 MainGame::MainGame()
 {
     d = RIGHT;
@@ -26,6 +81,24 @@ MainGame::MainGame()
             }
         }
     }
+    
+    if(def.size() > 0)
+    {
+        def.clear();
+    }
+    
+    if(score != NULL)
+    {
+        delete score;
+        score = NULL;
+    }
+    
+    if(value != NULL)
+    {
+        delete value;
+        value = NULL;
+    }
+    
     if(!loadEnemies())
     {
         throw std::runtime_error("Failed to load enemies");
@@ -37,8 +110,54 @@ MainGame::MainGame()
     }
     
     SDL_Color white = {255, 255, 255};
-    score_ = new Text("Score: ", white, 20);
-    value_ = new Text("0", white, 20);
+    score = new Text("Score: ", white, 20);
+    value = new Text("0", white, 20);
+    
+    def.push_back(new Defense(104, 360));
+    def.push_back(new Defense(104, 372));
+    def.push_back(new Defense(104, 384));
+    def.push_back(new Defense(116, 360));
+    def.push_back(new Defense(116, 372));
+    def.push_back(new Defense(128, 360));
+    def.push_back(new Defense(128, 372));
+    def.push_back(new Defense(140, 360));
+    def.push_back(new Defense(140, 372));
+    def.push_back(new Defense(140, 384));
+    
+    def.push_back(new Defense(232, 360));
+    def.push_back(new Defense(232, 372));
+    def.push_back(new Defense(232, 384));
+    def.push_back(new Defense(244, 360));
+    def.push_back(new Defense(244, 372));
+    def.push_back(new Defense(256, 360));
+    def.push_back(new Defense(256, 372));
+    def.push_back(new Defense(268, 360));
+    def.push_back(new Defense(268, 372));
+    def.push_back(new Defense(268, 384));
+    
+    def.push_back(new Defense(360, 360));
+    def.push_back(new Defense(360, 372));
+    def.push_back(new Defense(360, 384));
+    def.push_back(new Defense(372, 360));
+    def.push_back(new Defense(372, 372));
+    def.push_back(new Defense(384, 360));
+    def.push_back(new Defense(384, 372));
+    def.push_back(new Defense(396, 360));
+    def.push_back(new Defense(396, 372));
+    def.push_back(new Defense(396, 384));
+    
+    def.push_back(new Defense(488, 360));
+    def.push_back(new Defense(488, 372));
+    def.push_back(new Defense(488, 384));
+    def.push_back(new Defense(500, 360));
+    def.push_back(new Defense(500, 372));
+    def.push_back(new Defense(512, 360));
+    def.push_back(new Defense(512, 372));
+    def.push_back(new Defense(524, 360));
+    def.push_back(new Defense(524, 372));
+    def.push_back(new Defense(524, 384));
+    
+    
 }
 MainGame::~MainGame()
 {
@@ -54,6 +173,8 @@ MainGame::~MainGame()
     }
     
     myPC.~PC();
+    
+    
 }
 
 void MainGame::handleEvents()
@@ -99,6 +220,32 @@ void MainGame::logic()
         }
     }
     
+    for(int i = 0; i < def.size(); i++)
+    {
+        if(PCBullet != NULL && check_collision(PCBullet->getRect(), def[i]->getRect()))
+        {
+            PCBullet->~pcBullet();
+            PCBullet = NULL;
+            if(def[i]->health == 0)
+                def.erase(def.begin() + i);
+            else
+                --def[i]->health;
+        }
+    }
+    
+    for(int i = 0; i < def.size(); i++)
+    {
+        if(EBullet != NULL && check_collision(EBullet->getRect(), def[i]->getRect()))
+        {
+            EBullet->~enemyBullet();
+            EBullet = NULL;
+            if(def[i]->health == 0)
+                def.erase(def.begin() + i);
+            else
+                --def[i]->health;
+        }
+    }
+    
     
     if(EBullet != NULL && check_collision(EBullet->getRect(), myPC.getRect()))
     {
@@ -138,6 +285,9 @@ void MainGame::logic()
         //updates the rect for enemies which helps decide the direction to move in
         updateEnemyBox();
         
+        //update the direction of the enemy array
+        updateDirection();
+        
         //increment frame
         frame++;
     }
@@ -165,9 +315,6 @@ void MainGame::logic()
         EBullet->~enemyBullet();
         EBullet = NULL;
     }
-    
-    //update the direction of the enemy array
-    updateDirection();
 }
 
 void MainGame::render()
@@ -200,13 +347,18 @@ void MainGame::render()
     if(EBullet != NULL)
         EBullet->render();
     
-    score_->render(500, 0);
+    score->render(500, 0);
     
     std::string s = std::to_string(points_);
     
-    value_->setString(s);
+    value->setString(s);
     
-    value_->render(590, 0);
+    value->render(590, 0);
+    
+    for(int i = 0; i < def.size(); i++)
+    {
+        def[i]->render();
+    }
     
     SDL_RenderPresent(renderer);
 }
@@ -234,7 +386,10 @@ void GameOver::handleEvents()
             set_next_state(STATE_MAIN_GAME);
             return;
         }
-        mainMenu_->handleEvent();
+        if(mainMenu_->handleEvent())
+        {
+            set_next_state(STATE_MAIN_MENU);
+        }
 
     }
 }
@@ -269,6 +424,15 @@ void GameOver::render()
             }
         }
     }
+    
+    for(int i = 0; i < def.size(); i++)
+    {
+        def[i]->render();
+    }
+    
+    score->render(500, 0);
+
+    value->render(590, 0);
     
     //render pc
     myPC.render();

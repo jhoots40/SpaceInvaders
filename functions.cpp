@@ -1,7 +1,6 @@
 #include "functions.h"
 #include "globals.h"
 #include "constants.h"
-#inckude "defense.h"
 
 
 bool init()
@@ -151,7 +150,9 @@ void updateEnemyBox()
     else if(d == LEFT)
         enemyBox.x -= 8;
     else if(d == DOWN)
+    {
         enemyBox.y += 16;
+    }
 }
 
 void clean_up()
@@ -203,8 +204,10 @@ void change_state()
         
         switch(nextState)
         {
+            case STATE_MAIN_MENU:
+                currentState = new MainMenu();
+                break;
             case STATE_MAIN_GAME:
-                printf("made it here\n");
                 currentState = new MainGame();
                 break;
             case STATE_GAME_OVER:
