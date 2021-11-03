@@ -25,7 +25,6 @@ public:
 private:
     Text *spaceInvaders_;
     Text *play_;
-    Text *instructions_;
 };
 
 class MainGame : public GameState
